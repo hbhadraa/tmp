@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS File Transfer Onboarding</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
+    fieldset { margin-bottom: 20px; padding: 15px; background: #ffffff; border-radius: 8px; }
+    legend { font-weight: bold; }
+    label { display: block; margin-top: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+    .section { display: none; }
+  </style>
+</head>
+<body>
+  <h2>AWS File Transfer Onboarding</h2>
+  <form id="onboardingForm">
+    <fieldset>
+      <legend>General Info</legend>
+      <label>Customer ID <input type="text" name="customerId" required></label>
+      <label>Environment
+        <select name="environment">
+          <option value="dev">Dev</option>
+          <option value="test">Test</option>
+          <option value="prod">Prod</option>
+        </select>
+      </label>
+      <label>Workflow ID <input type="text" name="workflowId" required></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Source</legend>
+      <label>Source Type
+        <select name="sourceType" onchange="toggleSection('source')">
+          <option value="SFTP">SFTP</option>
+          <option value="S3">S3</option>
+        </select>
+      </label>
+      <div id="sourceSFTP" class="section">
+        <label>Host <input type="text" name="sourceHost"></label>
+        <label>Port <input type="number" name="sourcePort" value="22"></label>
+        <label>Username <input type="text" name="sourceUsername"></label>
+        <label>Auth Method
+          <select name="sourceAuthMethod" onchange="toggleAuth('source')">
+            <option value="ssh_key">SSH Key</option>
+            <option value="password">Password</option>
+          </select>
+        </label>
+        <div id="sourceSSHKey" class="section">
+          <label>SSH Key Name <input type="text" name="sourceSSHKey"></label>
+        </div>
+        <div id="sourcePassword" class="section">
+          <label>Password <input type="password" name="sourcePassword"></label>
+        </div>
+        <label>Path <input type="text" name="sourcePath"></label>
+      </div>
+      <div id="sourceS3" class="section">
+        <label>Bucket <input type="text" name="sourceBucket"></label>
+        <label>Prefix <input type="text" name="sourcePrefix"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Destination</legend>
+      <label>Destination Type
+        <select name="destType" onchange="toggleSection('dest')">
+          <option value="SFTP">SFTP</option>
+          <option value="S3">S3</option>
+        </select>
+      </label>
+      <div id="destSFTP" class="section">
+        <label>Host <input type="text" name="destHost"></label>
+        <label>Port <input type="number" name="destPort" value="22"></label>
+        <label>Username <input type="text" name="destUsername"></label>
+        <label>Auth Method
+          <select name="destAuthMethod" onchange="toggleAuth('dest')">
+            <option value="ssh_key">SSH Key</option>
+            <option value="password">Password</option>
+          </select>
+        </label>
+        <div id="destSSHKey" class="section">
+          <label>SSH Key Name <input type="text" name="destSSHKey"></label>
+        </div>
+        <div id="destPassword" class="section">
+          <label>Password <input type="password" name="destPassword"></label>
+        </div>
+        <label>Path <input type="text" name="destPath"></label>
+      </div>
+      <div id="destS3" class="section">
+        <label>Bucket <input type="text" name="destBucket"></label>
+        <label>Prefix <input type="text" name="destPrefix"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Schedule</legend>
+      <label>Schedule Type
+        <select name="scheduleType">
+          <option value="cron">Cron</option>
+        </select>
+      </label>
+      <label>Cron Expression <input type="text" name="cronExpression" placeholder="e.g., cron(0 3 * * ? *)"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Notifications</legend>
+      <label>SNS Topic ARN (Success) <input type="text" name="onSuccess"></label>
+      <label>SNS Topic ARN (Failure) <input type="text" name="onFailure"></label>
+    </fieldset>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    function toggleSection(prefix) {
+      const type = document.querySelector(`[name="${prefix}Type"]`).value;
+      document.getElementById(`${prefix}SFTP`).style.display = type === 'SFTP' ? 'block' : 'none';
+      document.getElementById(`${prefix}S3`).style.display = type === 'S3' ? 'block' : 'none';
+    }
+
+    function toggleAuth(prefix) {
+      const method = document.querySelector(`[name="${prefix}AuthMethod"]`).value;
+      document.getElementById(`${prefix}SSHKey`).style.display = method === 'ssh_key' ? 'block' : 'none';
+      document.getElementById(`${prefix}Password`).style.display = method === 'password' ? 'block' : 'none';
+    }
+
+    toggleSection('source');
+    toggleSection('dest');
+    toggleAuth('source');
+    toggleAuth('dest');
+  </script>
+</body>
+</html>
