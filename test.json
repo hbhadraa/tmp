@@ -1,0 +1,58 @@
+{
+  "version": "1.0",
+  "description": "Metadata to manage AWS Lambdas for S3 file transfers",
+  "functions": [
+    {
+      "action": "create",
+      "workflowId": "s3-copy-invoices",
+      "lambda": {
+        "functionName": "copyInvoicesLambda",
+        "runtime": "python3.12",
+        "handler": "lambda_function.lambda_handler",
+        "timeout": 60,
+        "memorySize": 256,
+        "environmentVariables": {
+          "TARGET_BUCKET": "finance-data-processed",
+          "TARGET_PREFIX": "invoices/"
+        },
+        "tags": {
+          "Project": "Finance",
+          "Owner": "data-team"
+        }
+      },
+      "source": {
+        "bucket": "finance-data-raw",
+        "prefix": "invoices/",
+        "events": ["s3:ObjectCreated:*"],
+        "filterSuffix": ".pdf"
+      },
+      "target": {
+        "bucket": "finance-data-processed",
+        "prefix": "invoices/"
+      },
+      "iamRole": {
+        "name": "LambdaS3CopyRole",
+        "policies": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "workflowId": "s3-copy-reports",
+      "lambda": {
+        "functionName": "copyReportsLambda",
+        "environmentVariables": {
+          "TARGET_BUCKET": "reports-destination-bucket",
+          "TARGET_PREFIX": "daily-reports/"
+        }
+      }
+    },
+    {
+      "action": "delete",
+      "workflowId": "s3-copy-logs",
+      "functionName": "copyLogsLambda"
+    }
+  ]
+}
